@@ -5,13 +5,18 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
 </head>
 <body>
+	<form action="/calibrate/" method="POST">
+		<button name="calibrateBtn" type="submit">Calibrate</button>
+	</form><br>
 	<form action="/start/" method="post">
 		<button name="startBtn" type="submit">Start</button>
 	</form><br>
 	<form action="/stop/" method="post">
 		<button name="stopBtn" type="submit">Stop</button>
 	</form><br>
-	<input type="text" id="speed" name="speed" value="0">m/s<br>
+	<form action="/speed/" method="POST">
+		<input type="text" id="speed" name="speed" value="{{ speed }}">m/s
+	</form><br>
 	<h4>{{ forward_message }}</h4>
 </body>
 </html>
