@@ -3,52 +3,104 @@
 <head>
 	<title>Interface</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
-	<style>
+	<!--<style>
 		#debugWindow {
 			width: 800px;
 			height: 200px;
 			border: 1px solid black;
 			overflow: scroll;
 			padding: 10px;
-		}
+		}-->
 	</style>
 </head>
 <body>
-    <form action="/findOdrive/" method="POST">
-		<button name="findOdriveBtn" type="submit">FindOdrive</button>
-	</form><br>
-	<form action="/calibrate/" method="POST">
-		<button name="calibrateBtn" type="submit">Calibrate</button>
-	</form><br>
-	<form action="/start/" method="post">
-		<button name="startBtn" type="submit">Start</button>
-	</form><br>
-	<form action="/stop/" method="post">
-		<button name="stopBtn" type="submit">Stop</button>
-	</form><br>
-	<form action="/speed/" method="POST">
-		<input type="text" id="speed" name="speed" value="{{ speed }}">m/s
-	</form><br>
-	<!-- <h4>{{ forward_message }}</h4> -->
+	<nav class="global-header hidden-print">
+			<div class="container">
+			<a class="navbar-brand"><img class="logo" src="https://stijl.kuleuven.be/2016/img/svg/logo.svg" width="157" height="56"></a>
+			</div>
+	</nav><br>
+	<div id="main">
+		<div id="controls">
+		    <form action="/findOdrive/" method="POST">
+				<button class="button findOdriveBtn" name="findOdriveBtn" type="submit">FindOdrive</button>
+			</form><br>
+			<form action="/calibrate/" method="POST">
+				<button class="button calibrateBtn" name="calibrateBtn" type="submit">Calibrate</button>
+			</form><br>
+			<form action="/start/" method="post" id="startForm">
+				<button class="button startBtn" name="startBtn" type="submit">Start</button>
+			</form><br>
+			<form action="/stop/" method="post" id="stopForm">
+				<button class="button stopBtn" name="stopBtn" type="submit">Stop</button>
+			</form><br>
+			<form>
+				<span class="label">Stop</span>
+				<label class="switch">
+				  	<input type="checkbox" id="toggleSlider">
+				  	<span class="slider round"></span>
+				</label>
+				<span class="label">Start</span>
+			</form><br> 
+			<form action="/speed/" method="POST">
+				<input class="speed" type="text" id="speed" name="speed" value="{{ speed }}">m/s
+			</form><br>
+			<!-- <h4>{{ forward_message }}</h4> -->
+		</div>
 
-	<div id="debugWindow"></div>
+		<div id="trackBuilder">
+			Trackbuilder
+		</div>
+
+		<div id="debugWindow"></div>
+	</div>
 
 	<script>
-	  // JavaScript code to update the debugging window
-	  function updateDebugWindow(message) {
-	    var debugWindow = document.getElementById("debugWindow");
-	    debugWindow.innerHTML += message + "<br>";
-	  }
+		document.getElementById("startForm").style.display = "none";
+		document.getElementById("stopForm").style.display = "none";
+	  	// JavaScript code to update the debugging window
+	  	function updateDebugWindow(message) {
+	    	var debugWindow = document.getElementById("debugWindow");
+	    	debugWindow.innerHTML += message + "<br>";
 
-	  // Fetch debug messages from the server and update the window
-	  fetch('/debug_messages/')
-	    .then(response => response.json())
-	    .then(data => {
-	      data.forEach(message => {
-	        updateDebugWindow(message);
-	      });
+	    	// Scroll to the bottom of the window
+	    	debugWindow.scrollTop = debugWindow.scrollHeight;
+	  	}
+
+	  	// Fetch debug messages from the server and update the window
+	  	fetch('/debug_messages/')
+	    	.then(response => response.json())
+	    	.then(data => {
+	      		data.forEach(message => {
+	        	updateDebugWindow(message);
+	      	});
 	    })
 	    .catch(error => console.log(error));
+
+	   	
+		var toggleSlider = document.getElementById("toggleSlider");
+		var startForm = document.getElementById("startForm");
+		var stopForm = document.getElementById("stopForm");
+
+		// Retrieve the slider state from localStorage
+		var sliderState = localStorage.getItem("sliderState");
+		if (sliderState === "checked") {
+			toggleSlider.checked = true;
+		} else {
+			toggleSlider.checked = false;
+		}
+
+		toggleSlider.addEventListener("change", function() {
+		if (toggleSlider.checked) {
+			//toggleSlider.checked = true;
+				startForm.submit();
+				localStorage.setItem("sliderState", "checked");
+		} else {
+			//toggleSlider.checked = false;
+				stopForm.submit();
+				localStorage.setItem("sliderState", "unchecked");
+		}
+		});
+	   	
 	</script>
 
 </body>

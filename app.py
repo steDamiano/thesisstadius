@@ -25,20 +25,21 @@ def index():
 def find_odrive():
     print("Finding an ODrive...", file=sys.stderr)
     forward_message = "Finding an ODrive..."
-    update_debug_window("Finding an ODrive...")
+    update_debug_window(forward_message)
     try:
         global odrv
         odrv = odrive.find_any(timeout=5)
         print("Odrive found", file=sys.stderr)
         forward_message = "ODrive found"
-        update_debug_window("ODrive found")
+        update_debug_window(forward_message)
     except TimeoutError:
         print("No ODrives found.", file=sys.stderr)
         forward_message = "No ODrives found."
-        update_debug_window("No ODrives found.")
+        update_debug_window(forward_message)
     except:
         print("Unknown error, check source.", file=sys.stderr)
-        update_debug_window("Unknown error, check source.")
+        forward_message = "Unknown error, check source."
+        update_debug_window(forward_message)
     return render_template('index.html', speed=speed, forward_message=forward_message)
 
 
@@ -86,15 +87,16 @@ def calibrate_motor():
         if (odrv.axis0.active_errors != 0):
             forward_message = "Calibration unsuccesful"
             print("Could not calibrate, Error: " + str(odrv.axis0.active_errors), file=sys.stderr)
-            update_debug_window("Could not calibrate")
+            forward_message = "Could not calibrate"
+            update_debug_window(forward_message)
         else:
             print("Calibration finished.", file=sys.stderr)
-            update_debug_window("Calibration finished.")
             forward_message = "Calibration finished"
+            update_debug_window(forward_message)
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
-        update_debug_window("No ODrive connected.")        
+        update_debug_window(forward_message)
     
     return render_template('index.html', speed=speed, forward_message=forward_message)
 
@@ -110,7 +112,7 @@ def start_motor():
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
-        update_debug_window("No ODrive connected.")   
+        update_debug_window(forward_message)
     return render_template('index.html', speed=speed, forward_message=forward_message)
 
 @app.route("/stop/", methods=['POST'])
@@ -128,7 +130,7 @@ def stop_motor():
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
-        update_debug_window("No ODrive connected.")   
+        update_debug_window(forward_message)   
     return render_template('index.html', speed=speed, forward_message=forward_message)
 
 @app.route("/speed/", methods=['GET', 'POST'])
@@ -147,7 +149,7 @@ def speed_motor():
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
-        update_debug_window("No ODrive connected.")
+        update_debug_window(forward_message)
     return render_template('index.html', speed=speed, forward_message=forward_message)
 
 @app.route('/debug_messages/')

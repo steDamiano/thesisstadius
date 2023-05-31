@@ -1,1 +1,303 @@
-#insert css when needed
+/* main.css */
+
+body {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;*/
+  background-color: #fff; /* Light blue background color */
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  /*align-items: center;
+  justify-content: center;*/
+}
+
+
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  margin-top: 50px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 4px;
+  border: none;
+  background-color: #1d8db0; /* Light blue button background color */
+  color: #fff; /* Dark gray button text color */
+  border-color: #067db0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Button box shadow */
+}
+
+.button:hover {
+  /*background-color: #d9edff; /* Light blue button background color on hover */
+  color: #fff;
+  background-color: #004070;
+  border-color: #003054
+}
+
+.startBtn {
+  background-color: #5cb85c; /* Green button background color */
+  color: white;
+}
+
+.stopBtn {
+  background-color: #d9534f; /* Red button background color */
+  color: white;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d9534f;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #5cb85c;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #5cb85c;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.flyout,.global-footer .footer-navbar,.global-header {
+    background: #1d8db0;
+    color: #fff;
+    font-size: .875rem;
+    border-bottom: 30px solid #fff
+}
+
+.logo {
+    display: inline-block;
+    background: transparent url(//stijl.kuleuven.be/2016tmp/img/svg/logo.svg) no-repeat center center;
+    background-size: 100% 100%;
+    width: 157px;
+    height: 56px;
+    margin-right: 30px
+}
+
+.no-svg .logo {
+    background-image: url(//stijl.kuleuven.be/2016tmp/img/logo.png)
+}
+
+.logo--xsm {
+    width: 107px;
+    height: 38px
+}
+
+.logo--sml {
+    width: 126px;
+    height: 45px
+}
+
+.logo--floating {
+    position: absolute;
+    top: 14px;
+    z-index: 20
+}
+
+.logo-2 {
+    margin-top: -25px;
+    width: 157px;
+    height: 56px
+}
+
+img,svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: top
+}
+
+.image-left {
+    float: left;
+    margin-right: 1rem;
+    margin-bottom: .5rem
+}
+
+.image-right {
+    float: right;
+    margin-left: 1rem;
+    margin-bottom: .5rem
+}
+
+.navbar {
+    position: relative;
+    padding: .5rem 1rem;
+    zoom:1}
+
+.navbar:after,.navbar:before {
+    content: "";
+    display: table
+}
+
+.navbar:after {
+    clear: both
+}
+
+.navbar-full {
+    z-index: 1000
+}
+
+.navbar-fixed-bottom,.navbar-fixed-top {
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 1030
+}
+
+.navbar-fixed-top {
+    top: 0
+}
+
+.navbar-fixed-bottom {
+    bottom: 0
+}
+
+.navbar-sticky-top {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    width: 100%
+}
+
+.navbar-brand {
+    float: left;
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    margin-right: 1rem;
+    font-size: 1.25rem
+}
+
+.navbar-brand:focus,.navbar-brand:hover {
+    text-decoration: none
+}
+
+.navbar-brand>img {
+    display: block
+}
+
+.global-header .container:first-child,.global-header .header2:first-child {
+    height: 40px
+}
+
+.global-header,.local-header {
+    zoom:1}
+
+.global-header:after,.global-header:before,.local-header:after,.local-header:before {
+    content: "";
+    display: table
+}
+
+.global-header:after,.local-header:after {
+    clear: both
+}
+
+.global-header .btn-toggle,.local-header .btn-toggle {
+    float: left
+}
+
+.global-header.menu-open .nav-tabs,.global-header.menu-open .navbar-collapse,.local-header.menu-open .nav-tabs,.local-header.menu-open .navbar-collapse {
+    display: block
+}
+
+#main {
+	width: 100%;
+	height: 100%;
+	margin-top: 1em;
+}
+
+#controls {
+  position: absolute;
+  left: 0;
+  width: 20%;
+  height: 70%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 30px;
+  /*outline: 1px solid black;*/
+  background-color: #f1f8ff; /* Light blue background color */
+}
+
+#trackBuilder {
+  position: absolute;
+  right: 0;
+  width: 80%;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#debugWindow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 20%;
+  border: 1px solid black;
+  overflow: auto;
+  /*padding: 10px;
+  /*margin-top: 20px;*/
+  background-color: #ebeced;
+}
