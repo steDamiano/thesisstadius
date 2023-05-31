@@ -3,6 +3,15 @@
 <head>
 	<title>Interface</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
+	<style>
+		#debugWindow {
+			width: 800px;
+			height: 200px;
+			border: 1px solid black;
+			overflow: scroll;
+			padding: 10px;
+		}
+	</style>
 </head>
 <body>
     <form action="/findOdrive/" method="POST">
@@ -20,6 +29,27 @@
 	<form action="/speed/" method="POST">
 		<input type="text" id="speed" name="speed" value="{{ speed }}">m/s
 	</form><br>
-	<h4>{{ forward_message }}</h4>
+	<!-- <h4>{{ forward_message }}</h4> -->
+
+	<div id="debugWindow"></div>
+
+	<script>
+	  // JavaScript code to update the debugging window
+	  function updateDebugWindow(message) {
+	    var debugWindow = document.getElementById("debugWindow");
+	    debugWindow.innerHTML += message + "<br>";
+	  }
+
+	  // Fetch debug messages from the server and update the window
+	  fetch('/debug_messages/')
+	    .then(response => response.json())
+	    .then(data => {
+	      data.forEach(message => {
+	        updateDebugWindow(message);
+	      });
+	    })
+	    .catch(error => console.log(error));
+	</script>
+
 </body>
 </html>
