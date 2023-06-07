@@ -3,15 +3,6 @@
 <head>
 	<title>Interface</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
-	<!--<style>
-		#debugWindow {
-			width: 800px;
-			height: 200px;
-			border: 1px solid black;
-			overflow: scroll;
-			padding: 10px;
-		}-->
-	</style>
 </head>
 <body>
 	<nav class="global-header hidden-print">
@@ -46,6 +37,7 @@
 				</form>
 			</div><br> 
 			<div id="speedDiv">
+				<b>Speed</b>
 				<form action="/speed/" method="POST">
 					<input class="speed" type="text" id="speed" name="speed" value="{{ speed }}">m/s
 				</form>
@@ -54,7 +46,37 @@
 		</div>
 
 		<div id="trackBuilder">
-			Trackbuilder
+			<!--Trackbuilder-->
+			<div id="trackRecorder">
+				<form action="/recordTrack/" method="POST">
+					<button class="button recordTrackBtn" name="recordTrackBtn" type="submit">Record track</button>
+				</form><br>
+			</div>
+			<div id="trackValues">
+				<h4><u>Current values</u></h4>
+				Track distance = {{ track_distance}} m <br>
+				Current speed = {{ current_speed }} m/s <br>
+			</div>
+			<div id="trackConditions">
+				<h4>Conditions</h4>
+				<div id="conditions">
+					<div id="cond" class="cond-layout">
+						<u>Condition 1</u><br>
+						Min distance: <form data-category="1" action="/minDistance/" method="POST">
+						<input class="condValue" type="text" id="con-minDistance" name="cond-minDistance" value="{{ min_distance }}">m</form><br>
+						Max distance: <form data-category="2" action="/maxDistance/" method="POST">
+						<input class="condValue" type="text" id="cond-maxDistance" name="cond-maxDistance" value="{{ max_distance }}">m</form><br>
+						Speed: <form data-category="3" action="/speedDistance/" method="POST">
+						<input class="condValue" type="text" id="cond-speedDistance" name="cond-speedDistance" value="{{ speed_distance }}">m/s</form>
+					</form>
+					</div>
+				</div>
+				<div id="buttonsCond">
+					<button class="button addCond" type="submit" name="addCond" onclick="CreateNewDom()">Add condition</button>
+					<button class="button setCond" type="submit" name="setCond" onclick="SetValues()">Set conditions</button>
+				</div>
+			</div>
+			
 		</div>
 
 		<div id="debugWindow"></div>
@@ -106,6 +128,29 @@
 				localStorage.setItem("sliderState", "unchecked");
 		}
 		});
+
+		function CreateNewDom() {
+			var DOMCondition = document.createElement("div");
+			var DOMConditionEx = document.getElementById("cond");
+			DOMCondition.innerHTML = DOMConditionEx.innerHTML;
+			DOMCondition.classList.add("cond-layout");
+			document.getElementById("conditions").appendChild(DOMCondition);
+		}
+
+		const form = document.querySelectorAll('form');
+		function SetValues() {
+			const data = [];
+			for(let i=0; i<form.length; i++) {
+				const elements = form[i].elements;
+				data.push({form: form[i].getAttribute('data-category'), inputData: {}});
+				for(let j=0; j<elements.length; j++) {
+					if(elements[j].class == 'condValue') {
+					  data[i].inputData[[elements[j].name]] = elements[j].value;
+					}
+				}
+			}
+  			console.log(data);
+		}
 	   	
 	</script>
 
