@@ -64,6 +64,23 @@ body {
   color: white;
 }
 
+.recordTrackBtn:hover {
+  color: #fff;
+  background-color: #4a1310;
+  border-color: #003054;
+}
+
+.playTrackBtn {
+  background-color: #5cb85c; /* Red button background color */
+  color: white;
+}
+
+.playTrackBtn:hover {
+  color: #fff;
+  background-color: #2b572b;
+  border-color: #003054;
+}
+
 .switch {
   position: relative;
   display: inline-block;
@@ -308,6 +325,13 @@ img,svg {
   margin-top: 50px;
 }
 
+.title {
+    margin-top: 10px;
+    margin-left: 5px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
 #trackBuilder {
   position: absolute;
   right: 0;
@@ -331,8 +355,44 @@ img,svg {
     position: absolute;
     top: 0;
     right: 0;
-    margin-top: 50px;
+/*    margin-top: 50px;*/
     margin-right: 100px;
+}
+
+#connectedODrive {
+    display:inline;
+}
+
+#currentSpeed {
+    display:inline;
+}
+
+#trackVisualizer {
+    position: absolute;
+    left: 250px;
+    right: 300px;
+    height: 65%;
+    outline: 3px solid black;
+}
+
+.crossed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+         background: 
+         linear-gradient(to top left,
+             rgba(0,0,0,0) 0%,
+             rgba(0,0,0,0) calc(50% - 0.8px),
+             rgba(0,0,0,1) 50%,
+             rgba(0,0,0,0) calc(50% + 0.8px),
+             rgba(0,0,0,0) 100%),
+         linear-gradient(to top right,
+             rgba(0,0,0,0) 0%,
+             rgba(0,0,0,0) calc(50% - 0.8px),
+             rgba(0,0,0,1) 50%,
+             rgba(0,0,0,0) calc(50% + 0.8px),
+             rgba(0,0,0,0) 100%);
 }
 
 #trackConditions {
