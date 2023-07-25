@@ -3,6 +3,7 @@
 <head>
 	<title>Interface</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
 	<nav class="global-header hidden-print">
@@ -12,20 +13,18 @@
 	</nav><br>
 	<div id="main">
 		<div id="controls">
+			<div class="title" id="titleQuickControls">Quick Controls</div>
 			<div id="setupDiv">
-			    <form action="/findOdrive/" method="POST">
-					<button class="button findOdriveBtn" name="findOdriveBtn" type="submit">FindOdrive</button>
-				</form><br>
-				<form action="/calibrate/" method="POST">
-					<button class="button calibrateBtn" name="calibrateBtn" type="submit">Calibrate</button>
-				</form>
+				<button class="button findOdriveBtn" id="findOdriveBtn" name="findOdriveBtn" type="submit">FindOdrive</button>
+				<button class="button calibrateBtn" id="calibrateBtn"name="calibrateBtn" type="submit">Calibrate</button>
+				Connected:<div id="connectedODrive">no connection</div>
 			</div><br>
 			<div id="startStopDiv">
-				<form action="/start/" method="post" id="startForm">
-					<button class="button startBtn" name="startBtn" type="submit">Start</button>
+				<form id="startForm">
+					<button class="button startBtn" id="startBtn" name="startBtn" type="submit">Start</button>
 				</form><br>
-				<form action="/stop/" method="post" id="stopForm">
-					<button class="button stopBtn" name="stopBtn" type="submit">Stop</button>
+				<form id="stopForm">
+					<button class="button stopBtn" id="stopBtn" name="stopBtn" type="submit">Stop</button>
 				</form><br>
 				<form>
 					<span class="label">Stop</span>
@@ -38,42 +37,55 @@
 			</div><br> 
 			<div id="speedDiv">
 				<b>Speed</b>
-				<form action="/speed/" method="POST">
+				<!-- <form action="/speed/" method="POST"> -->
+				<form id="speedForm" onsubmit="speedSubmit();return false;" method="POST">
 					<input class="speed" type="text" id="speed" name="speed" value="{{ speed }}">m/s
 				</form>
+				<!-- </form> -->
 			</div><br>
-			<!-- <h4>{{ forward_message }}</h4> -->
 		</div>
 
 		<div id="trackBuilder">
+			<div class="title" id="titleTrackBuilder">Track Builder</div>
 			<!--Trackbuilder-->
 			<div id="trackRecorder">
 				<form action="/recordTrack/" method="POST">
 					<button class="button recordTrackBtn" name="recordTrackBtn" type="submit">Record track</button>
 				</form><br>
+				<!-- <form action="/playTrack/" method="POST"> -->
+					<button class="button playTrackBtn" id="playTrackBtn" name="playTrackBtn" type="submit">Play track</button>
+				<!-- </form>--><br> 
 			</div>
+			<div class="crossed" id="trackVisualizer">Under Construction</div>
 			<div id="trackValues">
-				<h4><u>Current values</u></h4>
+				<div class="title" id="titleCurrentValues">Current Values</div>
+				<!-- <h4><u>Current values</u></h4> -->
 				Track distance = {{ track_distance}} m <br>
-				Current speed = {{ current_speed }} m/s <br>
+				<!-- Current speed = {{ current_speed }} m/s <br> -->
+				Current speed = <div id="currentSpeed"></div>m/s<br>
 			</div>
 			<div id="trackConditions">
-				<h4>Conditions</h4>
-				<div id="conditions">
-					<div id="cond" class="cond-layout">
-						<u>Condition 1</u><br>
-						Min distance: <form data-category="1" action="/minDistance/" method="POST">
-						<input class="condValue" type="text" id="con-minDistance" name="cond-minDistance" value="{{ min_distance }}">m</form><br>
-						Max distance: <form data-category="2" action="/maxDistance/" method="POST">
-						<input class="condValue" type="text" id="cond-maxDistance" name="cond-maxDistance" value="{{ max_distance }}">m</form><br>
-						Speed: <form data-category="3" action="/speedDistance/" method="POST">
-						<input class="condValue" type="text" id="cond-speedDistance" name="cond-speedDistance" value="{{ speed_distance }}">m/s</form>
-					</form>
+				<!-- <h4>Conditions</h4> -->
+				<div class="title" id="titleConditions">Conditions</div>
+				<form id="cond-form">
+					<div id="conditions">
+						<div id="cond" class="cond-layout">
+							<!-- <div id="cond-title"><u>Condition 1</u></div><br> -->
+								<u>Condition</u><br>
+								<label for="label-minDistance">Min distance: </label>
+								<input class="condValue" type="text" id="con-minDistance" name="cond-minDistance" value="{{ min_distance }}">m<br>
+								<label for="label-maxDistance">Max distance: </label>
+								<input class="condValue" type="text" id="con-maxDistance" name="cond-maxDistance" value="{{ max_distance }}">m<br>
+								<label for="label-speedDistance">Speed: </label>
+								<input class="condValue" type="text" id="con-speedDistance" name="cond-speedDistance" value="{{ speed_distance }}">m/s
+						</div>
 					</div>
-				</div>
+				</form>
 				<div id="buttonsCond">
 					<button class="button addCond" type="submit" name="addCond" onclick="CreateNewDom()">Add condition</button>
-					<button class="button setCond" type="submit" name="setCond" onclick="SetValues()">Set conditions</button>
+					<!-- <form action="/setConditions/" method="POST"> -->
+					<button id="btn-setCond" class="button setCond" type="submit" name="setCond">Set conditions</button>
+					<!-- </form> -->
 				</div>
 			</div>
 			
@@ -83,8 +95,14 @@
 	</div>
 
 	<script>
+		//Variables
+		var condData;
+		// var ODriveName = "no connection";
+		var ODriveName = "test"; //TODO: Remove, enkel voor test debugging
+
 		document.getElementById("startForm").style.display = "none";
 		document.getElementById("stopForm").style.display = "none";
+
 	  	// JavaScript code to update the debugging window
 	  	function updateDebugWindow(message) {
 	    	var debugWindow = document.getElementById("debugWindow");
@@ -120,38 +138,232 @@
 		toggleSlider.addEventListener("change", function() {
 		if (toggleSlider.checked) {
 			//toggleSlider.checked = true;
-				startForm.submit();
-				localStorage.setItem("sliderState", "checked");
+				// startForm.submit();
+				// localStorage.setItem("sliderState", "checked");
+				if(ODriveName == "no connection"){
+					updateDebugWindow("No ODrive connected.");
+					toggleSlider.checked = false;
+					localStorage.setItem("sliderState", "unchecked");
+				}
+				else{
+					localStorage.setItem("sliderState", "checked");
+					fetch('/start/')
+					.then(response => response.text())
+					.then(result => {
+						updateDebugWindow("Start");
+						updateDebugWindow(result);
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						updateDebugWindow('Error:', error);
+					});
+				}
 		} else {
 			//toggleSlider.checked = false;
-				stopForm.submit();
+				// stopForm.submit();
 				localStorage.setItem("sliderState", "unchecked");
-		}
+				if(ODriveName == "no connection"){
+					updateDebugWindow("No ODrive connected.");
+				}
+				else{
+					fetch('/stop/')
+					.then(response => response.text())
+					.then(result => {
+						updateDebugWindow("Stop");
+						updateDebugWindow(result);
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						updateDebugWindow('Error:', error);
+					});
+				}
+			}
 		});
 
+		//Speed change Function
+		function speedSubmit() {
+			updateDebugWindow("Speed changed");
+			var form = document.getElementById('speed').value;
+			// const speedData = Object.fromEntries(new FormData(form).entries());
+			fetch('/speed/', {
+				  method: 'POST',
+				  headers: {
+				    'Content-Type': 'text/plain'
+				  },
+				  body: speed: form
+				})
+				.then(response => response.text())
+				.then(result => {
+				  console.log(result);
+				  updateDebugWindow(result);
+				})
+				.catch(error => {
+				  console.error('Error:', error);
+				  updateDebugWindow('Error:', error);
+				});
+
+		}
+
+		//Play Track
+		const playTrackBtn = document.getElementById('playTrackBtn');
+
+		playTrackBtn.addEventListener('click', function (event) {
+			if(condData == undefined) {
+				updateDebugWindow("Conditions are empty");
+			}
+			else{
+				updateDebugWindow("Track being played");
+				const getTrackPlay = function() {
+					fetch(`/playTrack/`)  // send request to route /cartData
+				        .then((resp) => resp.json())
+				        .then(function(response) {
+				        	updateDebugWindow(response);
+				        });
+				}
+				getTrackPlay();
+			}
+			
+		});
+
+
+		//Add Condition
+		var numbCond = 1;
 		function CreateNewDom() {
+			numbCond = numbCond + 1;
 			var DOMCondition = document.createElement("div");
 			var DOMConditionEx = document.getElementById("cond");
 			DOMCondition.innerHTML = DOMConditionEx.innerHTML;
-			DOMCondition.classList.add("cond-layout");
-			document.getElementById("conditions").appendChild(DOMCondition);
+			DOMCondition.classList.add("cond-layout" , numbCond);
+			document.getElementById("conditions").appendChild(DOMCondition); 
+			var newDomMinDis = document.getElementById("con-minDistance");
+			var newDomMaxDis = document.getElementById("con-maxDistance");
+			var newDomSpeedDis = document.getElementById("con-speedDistance");
+			newDomMinDis.setAttribute("name","cond"+numbCond+"-minDistance");
+			newDomMaxDis.setAttribute("name","cond"+numbCond+"-maxDistance");
+			newDomSpeedDis.setAttribute("name","cond"+numbCond+"-speedDistance");
 		}
 
-		const form = document.querySelectorAll('form');
-		function SetValues() {
-			const data = [];
-			for(let i=0; i<form.length; i++) {
-				const elements = form[i].elements;
-				data.push({form: form[i].getAttribute('data-category'), inputData: {}});
-				for(let j=0; j<elements.length; j++) {
-					if(elements[j].class == 'condValue') {
-					  data[i].inputData[[elements[j].name]] = elements[j].value;
+		//Update Current Speed
+		document.addEventListener("DOMContentLoaded", function(event) {
+
+		    const getCartReading = function() {
+		      fetch(`/cartData`)  // send request to route /cartData
+		        .then((resp) => resp.json())
+		        .then(function(response) {
+		          document.getElementById('currentSpeed').innerHTML = response.data.toFixed(2);
+		      });
+		    }
+
+		    getCartReading();
+		    setInterval(getCartReading, 500);  //request for update every 500 ms
+		});
+
+		//Set Conditions Function
+		const condBtn = document.getElementById('btn-setCond');
+
+		condBtn.addEventListener('click', function (event) {
+			//fetch('/setConditions/');
+			const form = document.getElementById('cond-form');
+			const output = document.getElementById('output-cond');
+			condData = Object.fromEntries(new FormData(form).entries());
+			// output.innerHTML = JSON.stringify(data, undefined, 2);
+			// condData = JSON.stringify(data, undefined, 2)
+			if (CheckConditions()) {
+				updateDebugWindow("Conditions Updated:");
+				updateDebugWindow(JSON.stringify(condData, undefined, 2));
+				sendCondData();
+			}
+		});
+
+		function sendCondData() {
+            fetch('/setConditions/', {
+				  method: 'POST',
+				  headers: {
+				    'Content-Type': 'application/json'
+				  },
+				  body: JSON.stringify({conditionsData: condData})
+				})
+				.then(response => response.text())
+				.then(result => {
+				  console.log(result);
+				})
+				.catch(error => {
+				  console.error('Error:', error);
+				});
+        }
+
+		//Check Conditions
+		function CheckConditions() {
+			for (var key in condData) {
+				if (condData.hasOwnProperty(key)) {
+					// console.log(key + " -> " + condData[key]);
+					if (condData[key] == "") {
+						updateDebugWindow("Error: Not all condition values defined");
+						return false;
+					}
+					if (condData[key] > 10) {
+						// console.log("Data too large!")
+						updateDebugWindow("Error: Condition value is larger than track distance");
+						return false;
 					}
 				}
+				else {
+					updateDebugWindow("Error: Not all condition values defined");
+					return false;
+				}
 			}
-  			console.log(data);
+			return true;
 		}
-	   	
+
+		//Find ODrive Function
+		const findODriveBtn = document.getElementById('findOdriveBtn');
+
+		findODriveBtn.addEventListener('click', function (event) {
+			updateDebugWindow("Finding an ODrive...");
+			fetch('/findOdrive/')
+				.then(response => response.text())
+				.then(result => {
+					if(result == "No ODrives found.") {
+						updateDebugWindow("No ODrives found");
+					}
+					else if(result == "Unknown error, check source.") {
+						updateDebugWindow("Unknown error, check source.");
+					}
+					else{
+						ODriveName = result
+						console.log(result);
+						document.getElementById('connectedODrive').innerHTML = ODriveName;
+						updateDebugWindow(ODriveName + " connected");
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+		});
+
+		//Calibrate Function
+		const calibrateBtn = document.getElementById('calibrateBtn');
+
+		calibrateBtn.addEventListener('click', function (event) {
+			if(ODriveName == "no connection"){
+				updateDebugWindow("No ODrive connected.");
+			}
+			else{
+				updateDebugWindow("Applying config...");
+				fetch('/calibrate/')
+				.then(response => response.text())
+				.then(result => {
+					updateDebugWindow("Starting calibration...");
+					updateDebugWindow(result);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+			}
+		});
+   	
 	</script>
 
 </body>
