@@ -5,7 +5,7 @@ import subprocess
 
 import sys
 import odrive
-from fibre.libfibre import ObjectLostError
+#from fibre.libfibre import ObjectLostError
 from odrive.enums import *
 import time
 import math
@@ -16,6 +16,7 @@ forward_message = ""
 rpm = 0
 radius = 0.038
 track_distance = 0
+data = ""
 current_speed = 0
 debug_messages = []
 
@@ -26,7 +27,7 @@ debug_messages = []
 def index():
 	return render_template('index.html')
 
-@app.route("/findOdrive/", methods=['POST'])
+@app.route("/findOdrive/")
 def find_odrive():
     print("Finding an ODrive...", file=sys.stderr)
     forward_message = "Finding an ODrive..."
@@ -35,7 +36,8 @@ def find_odrive():
         global odrv
         odrv = odrive.find_any(timeout=5)
         print("Odrive found", file=sys.stderr)
-        forward_message = "ODrive found"
+        # forward_message = "ODrive found"
+        forward_message = "ODrive V3" #TODO: Aanapssen naar naam van ODrive
         update_debug_window(forward_message)
     except TimeoutError:
         print("No ODrives found.", file=sys.stderr)
@@ -45,10 +47,11 @@ def find_odrive():
         print("Unknown error, check source.", file=sys.stderr)
         forward_message = "Unknown error, check source."
         update_debug_window(forward_message)
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    return(forward_message)
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
 
-@app.route("/calibrate/", methods=['POST'])
+@app.route("/calibrate/")
 def calibrate_motor():
     try:
         print("Applying config...", file=sys.stderr)
@@ -90,9 +93,9 @@ def calibrate_motor():
         while odrv.axis0.current_state != AxisState.IDLE:
             time.sleep(0.1)
         if (odrv.axis0.active_errors != 0):
-            forward_message = "Calibration unsuccesful"
+            #forward_message = "Calibration unsuccesful"
             print("Could not calibrate, Error: " + str(odrv.axis0.active_errors), file=sys.stderr)
-            forward_message = "Could not calibrate"
+            forward_message = "Could not calibrate" + str(odrv.axis0.active_errors)
             update_debug_window(forward_message)
         else:
             print("Calibration finished.", file=sys.stderr)
@@ -102,10 +105,10 @@ def calibrate_motor():
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
         update_debug_window(forward_message)
-    
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    return forward_message
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
-@app.route("/start/", methods=['POST'])
+@app.route("/start/")
 def start_motor():
     try:
         #insert motor code
@@ -119,9 +122,10 @@ def start_motor():
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
         update_debug_window(forward_message)
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    return forward_message
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
-@app.route("/stop/", methods=['POST'])
+@app.route("/stop/")
 def stop_motor():
     try:
     	#insert motor code
@@ -137,40 +141,78 @@ def stop_motor():
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
-        update_debug_window(forward_message)   
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+        update_debug_window(forward_message)
+    return forward_message
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
 @app.route("/speed/", methods=['GET', 'POST'])
 def speed_motor():
+    print("IN FUNCTIE")
+    # try:
+    if request.method == 'POST':
+        global speed
+        print("1TESTTTTTT")
+        speed = request.form.get('speed')
+        print(speed)
+        print("2TESTTTTTT")
+        speed = float(speed)
+        print("The speed is %s" % (speed))
+        forward_message = "Motor speed set to %s m/s" % (speed)
+        update_debug_window(forward_message)
+        return forward_message
+        # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    else:
+        return "TODO: Change dit"
+            # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    # except:
+    #     print("No ODrive connected.", file=sys.stderr)
+    #     forward_message = "No ODrive connected."
+    #     update_debug_window(forward_message)
+    # return forward_message
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+
+@app.route("/recordTrack/", methods=['POST'])
+def record_track():
+    global track_distance
     try:
-        if request.method == 'POST':
-            global speed
-            speed = request.form['speed']
-            speed = float(speed)
-            print("The speed is %s" % (speed))
-            forward_message = "Motor speed set to %s m/s" % (speed)
-            update_debug_window(forward_message)
-            return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
-        else:
-            return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+        #Insert encoder code
+        start_pos = odrv.axis0.config.encoder.pos_estimate
+        odrv.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        odrv.axis0.controller.input_vel = 5
+
+        odrv.axis0.controller.input_vel = 0
+        track_distance = 10 #TODO: Aanpassen
+        forward_message = "Track distance equals to %s m" % (track_distance)
+        update_debug_window(forward_message)
     except:
+        track_distance = 10 #TODO: Aanpassen
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
         update_debug_window(forward_message)
     return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
-@app.route("/recordTrack/", methods=['POST'])
-def record_track():
+@app.route("/playTrack/")
+def play_track():
+    #Insert motor code
+    return jsonify("Track play successful")
+
+@app.route("/setConditions/", methods=['POST'])
+def set_conditions():
+    global data
+    data = request.json['conditionsData']
+    print(str(data))
+    return jsonify({'data': data})
+
+@app.route("/cartData")
+def cart_data():
     try:
-        #Insert encoder code
-        track_distance = 10
-        forward_message = "Track distance equals to %s m" % (track_distance)
-        update_debug_window(forward_message)
+        current_vel = odrv.axis0.config.encoder.vel_estimate
+        templateData = {'data' : current_vel}
+        return jsonify(templateData), 200
     except:
-        print("No ODrive connected.", file=sys.stderr)
-        forward_message = "No ODrive connected.blabla"
-        update_debug_window(forward_message)
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed) 
+        current_vel = 0
+        templateData = {'data': current_vel}
+        return jsonify(templateData), 200
 
 @app.route('/debug_messages/')
 def get_debug_messages():
