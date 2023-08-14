@@ -363,6 +363,10 @@ img,svg {
     display:inline;
 }
 
+#trackDistance {
+    display:inline;
+}
+
 #currentSpeed {
     display:inline;
 }
