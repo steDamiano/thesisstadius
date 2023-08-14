@@ -145,16 +145,13 @@ def stop_motor():
     return forward_message
     # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
-@app.route("/speed/", methods=['GET', 'POST'])
+@app.route("/speed/", methods=['POST'])
 def speed_motor():
-    print("IN FUNCTIE")
     # try:
     if request.method == 'POST':
         global speed
-        print("1TESTTTTTT")
-        speed = request.form.get('speed')
+        speed = request.json['speedData']
         print(speed)
-        print("2TESTTTTTT")
         speed = float(speed)
         print("The speed is %s" % (speed))
         forward_message = "Motor speed set to %s m/s" % (speed)
@@ -171,7 +168,7 @@ def speed_motor():
     # return forward_message
     # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
-@app.route("/recordTrack/", methods=['POST'])
+@app.route("/recordTrack/")
 def record_track():
     global track_distance
     try:
@@ -185,11 +182,12 @@ def record_track():
         forward_message = "Track distance equals to %s m" % (track_distance)
         update_debug_window(forward_message)
     except:
-        track_distance = 10 #TODO: Aanpassen
+        track_distance = 1 #TODO: Aanpassen
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
         update_debug_window(forward_message)
-    return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
+    return str(track_distance)
+    # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
 @app.route("/playTrack/")
 def play_track():
