@@ -38,8 +38,8 @@
 			<div id="speedDiv">
 				<b>Speed</b>
 				<!-- <form action="/speed/" method="POST"> -->
-				<form id="speedForm" onsubmit="speedSubmit();return false;" method="POST">
-					<input class="speed" type="text" id="speed" name="speed" value="{{ speed }}">m/s
+				<form id="speedForm" onsubmit="speedSubmit();return false;" name="speed">
+					<input class="speed" type="text" id="speed_input" name="speed_input" value="{{ speed }}">m/s
 				</form>
 				<!-- </form> -->
 			</div><br>
@@ -49,9 +49,9 @@
 			<div class="title" id="titleTrackBuilder">Track Builder</div>
 			<!--Trackbuilder-->
 			<div id="trackRecorder">
-				<form action="/recordTrack/" method="POST">
-					<button class="button recordTrackBtn" name="recordTrackBtn" type="submit">Record track</button>
-				</form><br>
+				<!-- <form action="/recordTrack/" method="POST"> -->
+					<button class="button recordTrackBtn" id="recordTrackBtn" name="recordTrackBtn" type="submit">Record track</button>
+				<!-- </form><br> --><br>
 				<!-- <form action="/playTrack/" method="POST"> -->
 					<button class="button playTrackBtn" id="playTrackBtn" name="playTrackBtn" type="submit">Play track</button>
 				<!-- </form>--><br> 
@@ -60,7 +60,7 @@
 			<div id="trackValues">
 				<div class="title" id="titleCurrentValues">Current Values</div>
 				<!-- <h4><u>Current values</u></h4> -->
-				Track distance = {{ track_distance}} m <br>
+				Track distance = <div id="trackDistance"></div> m <br>
 				<!-- Current speed = {{ current_speed }} m/s <br> -->
 				Current speed = <div id="currentSpeed"></div>m/s<br>
 			</div>
@@ -183,14 +183,15 @@
 		//Speed change Function
 		function speedSubmit() {
 			updateDebugWindow("Speed changed");
-			var form = document.getElementById('speed').value;
+			var form = document.getElementById('speed_input').value;
 			// const speedData = Object.fromEntries(new FormData(form).entries());
+			console.log(form);
 			fetch('/speed/', {
 				  method: 'POST',
 				  headers: {
-				    'Content-Type': 'text/plain'
+				    'Content-Type': 'application/json'
 				  },
-				  body: speed: form
+				  body: JSON.stringify({speedData: form})
 				})
 				.then(response => response.text())
 				.then(result => {
@@ -356,6 +357,29 @@
 				.then(result => {
 					updateDebugWindow("Starting calibration...");
 					updateDebugWindow(result);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+			}
+		});
+
+		//RecordTrack Function
+		const recordTrackBtn = document.getElementById('recordTrackBtn');
+
+		recordTrackBtn.addEventListener('click', function (event) {
+			if(ODriveName == "no connection"){
+				updateDebugWindow("No ODrive connected.");
+			}
+			else{
+				updateDebugWindow("Recording track...");
+				fetch('/recordTrack/')
+				.then(response => response.text())
+				.then(result => {
+					updateDebugWindow("Track distance equals to " + result + "m");
+					document.getElementById('trackDistance').innerHTML = result;
+					// updateDebugWindow(result);
 				})
 				.catch(error => {
 					console.error('Error:', error);
