@@ -262,9 +262,10 @@
 				        .then((resp) => resp.json())
 				        .then(function(response) {
 				        	console.log(response.startPos);
+				        	console.log(response.endPos);
 				          document.getElementById('currentSpeed').innerHTML = response.vel;
-				          document.getElementById('startPos').innerHTML = response.startPos;
-				          document.getElementById('endPos').innerHTML = response.endPos;
+				          document.getElementById('startPosition').innerHTML = response.startPos;
+				          document.getElementById('endPosition').innerHTML = response.endPos;
 				      });
 		    	} catch (error) {
 		    		updateDebugWindow("Connection lost");
