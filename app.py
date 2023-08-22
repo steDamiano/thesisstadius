@@ -10,6 +10,8 @@ from odrive.enums import *
 import time
 import math
 
+# from scripts import odrive_interface
+
 app = Flask(__name__)
 speed = 0
 forward_message = ""
@@ -114,7 +116,7 @@ def start_motor():
         #insert motor code
         print("Start pressed", file=sys.stderr)
         odrv.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL  
-        rps = (speed/(2*math.pi*radius))*(40/13)
+        rps = (speed/(2*math.pi*radius))*(32/14)
         odrv.axis0.controller.input_vel = rps
         forward_message = "Motor is running at a speed of %s m/s" % (speed)
         update_debug_window(forward_message)
@@ -189,10 +191,32 @@ def record_track():
     return str(track_distance)
     # return render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
+@app.route("/setStart/")
+def set_start():
+    #set_traj_start()
+    forward_message = "Track start is set"
+    return forward_message
+
+@app.route("/setEnd/")
+def set_end():
+    #set_traj_end()
+    track_distance = 3
+    #track_distance = ((get_traj_end()-get_traj_start()) * (2 * math.pi * radius)) / (32 / 14)
+    return str(track_distance)
+
 @app.route("/playTrack/")
 def play_track():
     #Insert motor code
-    return jsonify("Track play successful")
+    #go_to_end():
+    forward_message = "Track play successful"
+    return forward_message
+
+@app.route("/resetPos/")
+def reset_pos():
+    #Insert motor code
+    #go_to_start():
+    forward_message = "Position reset successful"
+    return forward_message
 
 @app.route("/setConditions/", methods=['POST'])
 def set_conditions():
