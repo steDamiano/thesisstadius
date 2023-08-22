@@ -173,6 +173,8 @@ def speed_motor():
         speed = request.json['speedData']
         print(speed)
         speed = float(speed)
+        rps = (speed / (2 * math.pi * radius)) * (32 / 14)
+        od.set_speed(rps)
         print("The speed is %s" % (speed))
         forward_message = "Motor speed set to %s m/s" % (speed)
         update_debug_window(forward_message)
@@ -248,6 +250,9 @@ def reset_pos():
 def set_conditions():
     global data
     data = request.json['conditionsData']
+    speed = data.cond-speedDistance
+    rps = (speed / (2 * math.pi * radius)) * (32 / 14)
+    od.set_speed(rps)
     print(str(data))
     return jsonify({'data': data})
 
@@ -256,9 +261,10 @@ def set_conditions():
 def cart_data():
     try:
         current_vel = round(od.get_speed(),2)
+        current_speed = ((current_vel) * (2 * math.pi * radius)) / (32 / 14)
         start_pos = round(od.get_traj_start(),2)
         end_pos = round(od.get_traj_end(),2)
-        templateData = {'vel': current_vel, 'startPos': start_pos, 'endPos': end_pos}
+        templateData = {'vel': current_speed, 'startPos': start_pos, 'endPos': end_pos}
         return jsonify(templateData), 200
     except:
         current_vel = 0
