@@ -10,7 +10,7 @@ from odrive.enums import *
 import time
 import math
 
-# from scripts import odrive_interface
+from scripts import odrive_interface
 
 app = Flask(__name__)
 speed = 0
@@ -21,6 +21,8 @@ track_distance = 0
 data = ""
 current_speed = 0
 debug_messages = []
+
+od = odrive_interface.ODriveInterfaceAPI()
 
 #template = render_template('index.html', speed=speed, forward_message=forward_message, track_distance=track_distance, current_speed=current_speed)
 
@@ -35,12 +37,16 @@ def find_odrive():
     forward_message = "Finding an ODrive..."
     update_debug_window(forward_message)
     try:
+        """
         global odrv
         odrv = odrive.find_any(timeout=5)
         print("Odrive found", file=sys.stderr)
         # forward_message = "ODrive found"
+        """
+
         forward_message = "ODrive V3" #TODO: Aanapssen naar naam van ODrive
         update_debug_window(forward_message)
+        od.connect()
     except TimeoutError:
         print("No ODrives found.", file=sys.stderr)
         forward_message = "No ODrives found."
@@ -56,7 +62,11 @@ def find_odrive():
 @app.route("/calibrate/")
 def calibrate_motor():
     try:
+        od.calibrate()
+
+        """
         print("Applying config...", file=sys.stderr)
+        
         update_debug_window("Applying config...")
         odrv.config.dc_bus_overvoltage_trip_level = 30
         odrv.config.dc_max_positive_current = 2
@@ -103,6 +113,9 @@ def calibrate_motor():
             print("Calibration finished.", file=sys.stderr)
             forward_message = "Calibration finished"
             update_debug_window(forward_message)
+        """
+        forward_message = "Calibration finished"
+        update_debug_window(forward_message)
     except:
         print("No ODrive connected.", file=sys.stderr)
         forward_message = "No ODrive connected."
@@ -193,28 +206,30 @@ def record_track():
 
 @app.route("/setStart/")
 def set_start():
-    #set_traj_start()
+    od.set_traj_start()
     forward_message = "Track start is set"
     return forward_message
 
 @app.route("/setEnd/")
 def set_end():
-    #set_traj_end()
-    track_distance = 3
-    #track_distance = ((get_traj_end()-get_traj_start()) * (2 * math.pi * radius)) / (32 / 14)
+    od.set_traj_end()
+    #track_distance = 3
+    track_distance = ((od.get_traj_end()-od.get_traj_start()) * (2 * math.pi * radius)) / (32 / 14)
+    od.engage()
+
     return str(track_distance)
 
 @app.route("/playTrack/")
 def play_track():
     #Insert motor code
-    #go_to_end():
+    od.go_to_end()
     forward_message = "Track play successful"
     return forward_message
 
 @app.route("/resetPos/")
 def reset_pos():
     #Insert motor code
-    #go_to_start():
+    od.go_to_start()
     forward_message = "Position reset successful"
     return forward_message
 
