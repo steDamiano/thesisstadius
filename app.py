@@ -255,7 +255,7 @@ def set_conditions():
 @app.route("/cartData")
 def cart_data():
     try:
-        current_vel = od.get_speed()
+        current_vel = round(od.get_speed(),2)
         start_pos = od.get_traj_start()
         end_pos = od.get_traj_end()
         templateData = {'vel': current_vel, 'startPos': start_pos, 'endPos': end_pos}
