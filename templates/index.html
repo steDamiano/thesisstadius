@@ -3,6 +3,10 @@
 <head>
 	<title>Interface</title>
 	<link rel="stylesheet" type="text/css" media="screen" href="../static/main.css" />
+	<link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="static/favicon-16x16.png">
+	<link rel="manifest" href="static/site.webmanifest">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
@@ -51,9 +55,12 @@
 			<div id="trackRecorder">
 				<!-- <form action="/recordTrack/" method="POST"> -->
 					<button class="button recordTrackBtn" id="recordTrackBtn" name="recordTrackBtn" type="submit">Record track</button>
-				<!-- </form><br> --><br>
+				<!-- </form><br> -->
 				<!-- <form action="/playTrack/" method="POST"> -->
+					<button class="button setStartBtn" id="setStartBtn" name="setStartBtn" type="submit">Set start</button>
+					<button class="button setEndBtn" id="setEndBtn" name="setEndBtn" type="submit">Set end</button><br>
 					<button class="button playTrackBtn" id="playTrackBtn" name="playTrackBtn" type="submit">Play track</button>
+					<button class="button resetPosBtn" id="resetPosBtn" name="resetPosBtn" type="submit">Reset position</button>
 				<!-- </form>--><br> 
 			</div>
 			<div class="crossed" id="trackVisualizer">Under Construction</div>
@@ -248,11 +255,15 @@
 		document.addEventListener("DOMContentLoaded", function(event) {
 
 		    const getCartReading = function() {
-		      fetch(`/cartData`)  // send request to route /cartData
-		        .then((resp) => resp.json())
-		        .then(function(response) {
-		          document.getElementById('currentSpeed').innerHTML = response.data.toFixed(2);
-		      });
+		    	try{
+				      fetch(`/cartData`)  // send request to route /cartData
+				        .then((resp) => resp.json())
+				        .then(function(response) {
+				          document.getElementById('currentSpeed').innerHTML = response.data.toFixed(2);
+				      });
+		    	} catch (error) {
+		    		updateDebugWindow("Connection lost");
+		    	}
 		    }
 
 		    getCartReading();
@@ -380,6 +391,71 @@
 					updateDebugWindow("Track distance equals to " + result + "m");
 					document.getElementById('trackDistance').innerHTML = result;
 					// updateDebugWindow(result);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+			}
+		});
+
+		//SetStart Function
+		const setStartBtn = document.getElementById('setStartBtn');
+
+		setStartBtn.addEventListener('click', function (event) {
+			if(ODriveName == "no connection"){
+				updateDebugWindow("No ODrive connected.");
+			}
+			else{
+				fetch('/setStart/')
+				.then(response => response.text())
+				.then(result => {
+					// updateDebugWindow("Track distance equals to " + result + "m");
+					// document.getElementById('trackDistance').innerHTML = result;
+					updateDebugWindow(result);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+			}
+		});
+
+		//SetEnd Function
+		const setEndBtn = document.getElementById('setEndBtn');
+
+		setEndBtn.addEventListener('click', function (event) {
+			if(ODriveName == "no connection"){
+				updateDebugWindow("No ODrive connected.");
+			}
+			else{
+				fetch('/setEnd/')
+				.then(response => response.text())
+				.then(result => {
+					updateDebugWindow("Track end is set");
+					updateDebugWindow("Track distance equals to " + result + "m");
+					document.getElementById('trackDistance').innerHTML = result;
+					// updateDebugWindow(result);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+				});
+			}
+		});
+
+		//ResetPosition Function
+		const resetPosBtn = document.getElementById('resetPosBtn');
+
+		resetPosBtn.addEventListener('click', function (event) {
+			if(ODriveName == "no connection"){
+				updateDebugWindow("No ODrive connected.");
+			}
+			else{
+				fetch('/resetPos/')
+				.then(response => response.text())
+				.then(result => {
+					updateDebugWindow(result);
 				})
 				.catch(error => {
 					console.error('Error:', error);
