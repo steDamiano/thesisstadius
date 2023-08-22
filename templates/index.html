@@ -70,6 +70,8 @@
 				Track distance = <div id="trackDistance"></div> m <br>
 				<!-- Current speed = {{ current_speed }} m/s <br> -->
 				Current speed = <div id="currentSpeed"></div>m/s<br>
+				Start position = <div id="startPosition"></div>  <br>
+				End position = <div id="endPosition"></div>  <br>
 			</div>
 			<div id="trackConditions">
 				<!-- <h4>Conditions</h4> -->
@@ -259,7 +261,10 @@
 				      fetch(`/cartData`)  // send request to route /cartData
 				        .then((resp) => resp.json())
 				        .then(function(response) {
-				          document.getElementById('currentSpeed').innerHTML = response.data.toFixed(2);
+				        	console.log(response.startPos);
+				          document.getElementById('currentSpeed').innerHTML = response.vel;
+				          document.getElementById('startPos').innerHTML = response.startPos;
+				          document.getElementById('endPos').innerHTML = response.endPos;
 				      });
 		    	} catch (error) {
 		    		updateDebugWindow("Connection lost");
