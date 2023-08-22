@@ -256,13 +256,13 @@ def set_conditions():
 def cart_data():
     try:
         current_vel = round(od.get_speed(),2)
-        start_pos = od.get_traj_start()
-        end_pos = od.get_traj_end()
+        start_pos = round(od.get_traj_start(),2)
+        end_pos = round(od.get_traj_end(),2)
         templateData = {'vel': current_vel, 'startPos': start_pos, 'endPos': end_pos}
         return jsonify(templateData), 200
     except:
         current_vel = 0
-        templateData = {'data': current_vel}
+        templateData = {'vel': current_vel}
         return jsonify(templateData), 200
 
 
