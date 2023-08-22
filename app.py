@@ -260,8 +260,8 @@ def set_conditions():
 @app.route("/cartData")
 def cart_data():
     try:
-        current_vel = round(od.get_speed(),2)
-        current_speed = ((current_vel) * (2 * math.pi * radius)) / (32 / 14)
+        current_vel = od.get_speed()
+        current_speed = round(((current_vel) * (2 * math.pi * radius)) / (32 / 14),2)
         start_pos = round(od.get_traj_start(),2)
         end_pos = round(od.get_traj_end(),2)
         templateData = {'vel': current_speed, 'startPos': start_pos, 'endPos': end_pos}
