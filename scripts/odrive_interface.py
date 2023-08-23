@@ -4,7 +4,7 @@ import logging
 
 import odrive
 from odrive.enums import *
-from ruckig import InputParameter, OutputParameter, Result, Ruckig
+# from ruckig import InputParameter, OutputParameter, Result, Ruckig
 import matplotlib.pyplot as plt 
 from copy import copy
 
@@ -270,53 +270,53 @@ class ODriveInterfaceAPI(object):
             time.sleep(0.001)            
         
         # Calculate theoretical trajectory and plot it with measurements
-        positions_th, speeds_th, accelerations_th, times_th = self.calculate_theoretical_traj(speed, accel, target_pos - start_pos)
-        plt.plot(times, speeds, label = "Measurements")
-        plt.plot(times_th, speeds_th, "--", label = "Theoretical")
-        plt.title("Trajectory Position")
-        plt.ylabel("Rotations/s")
-        plt.xlabel("Time (s)")
-        plt.legend(loc="upper left")
-        plt.show()
+        # positions_th, speeds_th, accelerations_th, times_th = self.calculate_theoretical_traj(speed, accel, target_pos - start_pos)
+        # plt.plot(times, speeds, label = "Measurements")
+        # plt.plot(times_th, speeds_th, "--", label = "Theoretical")
+        # plt.title("Trajectory Position")
+        # plt.ylabel("Rotations/s")
+        # plt.xlabel("Time (s)")
+        # plt.legend(loc="upper left")
+        # plt.show()
         
         return True      
         
-    def calculate_theoretical_traj(self, speed, accel, target_pos):
-        otg = Ruckig(1, 0.01)  # DoFs, control cycle
-        inp = InputParameter(1)
-        out = OutputParameter(1)
-     
-        # Set input parameters
-        inp.current_position = [0]
-        inp.current_velocity = [0.0]
-        inp.current_acceleration = [0.0]
-     
-        inp.target_position = [target_pos]
-        inp.target_velocity = [0.0]
-        inp.target_acceleration = [0.0]
-     
-        inp.max_velocity = [speed]
-        inp.max_acceleration = [accel]
-        inp.max_jerk = [100000]
-      
-        # Generate the trajectory within the control loop
-        first_output, out_list = None, []
-        positions, speeds, accelerations, times = [], [], [], []
-        res = Result.Working
-        while res == Result.Working:
-            res = otg.update(inp, out)
-     
-            out_list.append(copy(out))
-            times.append(out.time)
-            positions.append(out.new_position)
-            speeds.append(out.new_velocity)
-            accelerations.append(out.new_acceleration)
-            out.pass_to_input(inp)
-     
-            if not first_output:
-                first_output = copy(out)
-            
-        return positions, speeds, accelerations, times
+    # def calculate_theoretical_traj(self, speed, accel, target_pos):
+    #     otg = Ruckig(1, 0.01)  # DoFs, control cycle
+    #     inp = InputParameter(1)
+    #     out = OutputParameter(1)
+    #
+    #     # Set input parameters
+    #     inp.current_position = [0]
+    #     inp.current_velocity = [0.0]
+    #     inp.current_acceleration = [0.0]
+    #
+    #     inp.target_position = [target_pos]
+    #     inp.target_velocity = [0.0]
+    #     inp.target_acceleration = [0.0]
+    #
+    #     inp.max_velocity = [speed]
+    #     inp.max_acceleration = [accel]
+    #     inp.max_jerk = [100000]
+    #
+    #     # Generate the trajectory within the control loop
+    #     first_output, out_list = None, []
+    #     positions, speeds, accelerations, times = [], [], [], []
+    #     res = Result.Working
+    #     while res == Result.Working:
+    #         res = otg.update(inp, out)
+    #
+    #         out_list.append(copy(out))
+    #         times.append(out.time)
+    #         positions.append(out.new_position)
+    #         speeds.append(out.new_velocity)
+    #         accelerations.append(out.new_acceleration)
+    #         out.pass_to_input(inp)
+    #
+    #         if not first_output:
+    #             first_output = copy(out)
+    #
+    #     return positions, speeds, accelerations, times
     
     def get_pos(self):
         if not self.driver:
