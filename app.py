@@ -251,7 +251,7 @@ def set_conditions():
     global data
     data = request.json['conditionsData']
     speed = data["condSpeedDistance"]
-    rps = (speed / (2 * math.pi * radius)) * (32 / 14)
+    rps = (float(speed) / (2 * math.pi * radius)) * (32 / 14)
     od.set_speed(rps)
     print(str(data))
     return jsonify({'data': data})
