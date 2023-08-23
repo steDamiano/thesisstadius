@@ -250,7 +250,7 @@ def reset_pos():
 def set_conditions():
     global data
     data = request.json['conditionsData']
-    speed = data.cond-speedDistance
+    speed = data.condSpeedDistance
     rps = (speed / (2 * math.pi * radius)) * (32 / 14)
     od.set_speed(rps)
     print(str(data))
