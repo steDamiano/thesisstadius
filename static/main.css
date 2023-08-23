@@ -371,6 +371,14 @@ img,svg {
     display:inline;
 }
 
+#startPosition {
+    display:inline;
+}
+
+#sendPosition {
+    display:inline;
+}
+
 #trackVisualizer {
     position: absolute;
     left: 250px;
