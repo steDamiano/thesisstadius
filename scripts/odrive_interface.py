@@ -26,7 +26,7 @@ class ODriveInterfaceAPI(object):
     
     #default speed & accel
     speed = 3
-    accel = 3
+    accel = 10
     
     speed_limit = 20
     accel_limit = 40
