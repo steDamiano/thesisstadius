@@ -5,7 +5,7 @@ import time
 
 import odrive
 from odrive.enums import *
-from ruckig import InputParameter, OutputParameter, Result, Ruckig
+# from ruckig import InputParameter, OutputParameter, Result, Ruckig
 import matplotlib.pyplot as plt 
 from copy import copy
 
@@ -290,7 +290,7 @@ class ODriveInterfaceAPI(object):
             time.sleep(0.001)            
         
         return True      
-        
+
     def get_pos(self):
         if not self.driver:
             print("Odrive not connected")
@@ -329,11 +329,8 @@ class ODriveInterfaceAPI(object):
         self.axis.trap_traj.config.decel_limit = self.accel
         return True
         
-        """
     def synchronous_start(self):
         if (self.ptp_master.sync_clock()):
             time.sleep(3)
             self.go_to_end()
         
-           """
-           
