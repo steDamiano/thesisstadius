@@ -3,7 +3,6 @@ import sys
 from datetime import datetime
 import time
 import numpy as np
-import sounddevice as sd
 import time
 import soundfile as sf
 import os
@@ -23,22 +22,11 @@ class PTP_Master(object):
     synced_time = None
     offset_final = 0
     
-    """ Audio Info """
-    device = None
-    frequency = 5000
-    amplitude = 0.5
-    samplerate = sd.query_devices(device, 'output')['default_samplerate']
-    sd.default.latency = 'high'
-    sine_stream = None
-    start_idx = 0
-    play_sine = False
     
     def __init__(self, active_odrive = None):
         self.setup()
         
     def setup(self):
-        self.sine_stream = sd.OutputStream(device=self.device, channels=1, callback=self.sine_callback,
-                         samplerate=self.samplerate)
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.server_socket.settimeout(5)
@@ -52,14 +40,6 @@ class PTP_Master(object):
             print("Error creating socket: " + str(e) + ". Exitting ...")
             self.server_socket.close()
         
-    def sine_callback(self, outdata, frames, time, status):
-        if status:
-            print(status, file=sys.stderr)
-        t = (self.start_idx + np.arange(frames)) / self.samplerate
-        t = t.reshape(-1, 1)
-        outdata[:] = self.amplitude * np.sin(2 * np.pi * self.frequency * t)
-        self.start_idx += frames
-    
     
     def sync_clock(self):
         self.OFFSETS = []
@@ -118,13 +98,7 @@ class PTP_Master(object):
                 print("Synced time: ", self.synced_time)
                 print("Stream latency: ", self.sine_stream.latency)
                 print("Succesfull packets: ", len(self.OFFSETS))
-                #play sine wave that indicates synchronisation
-                if not self.play_sine:
-                    return True
-                else:
-                    with self.sine_stream:
-                        self.accurate_delay(1)
-                    return True
+                return True
         
         except Exception as e:
             print("Error syncing times")
