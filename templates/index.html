@@ -68,6 +68,7 @@
 				<!-- <h4><u>Current values</u></h4> -->
 				Track distance = <div id="trackDistance"></div> m <br>
 				<!-- Current speed = {{ current_speed }} m/s <br> -->
+				Current pos = <div id="currentPos"></div>m<br>
 				Current speed = <div id="currentSpeed"></div>m/s<br>
 			</div>
 		</div>
@@ -205,6 +206,7 @@
 				        	console.log(response.startPos);
 				        	console.log(response.endPos);
 				          document.getElementById('currentSpeed').innerHTML = response.vel;
+				          document.getElementById('currentPos').innerHTML = response.pos;
 				      });
 		    	} catch (error) {
 		    		updateDebugWindow("Connection lost");

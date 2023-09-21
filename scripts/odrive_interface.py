@@ -2,6 +2,8 @@ import sys
 import time
 import logging
 import time
+import math
+import json
 
 import odrive
 from odrive.enums import *
@@ -9,7 +11,11 @@ from odrive.enums import *
 import matplotlib.pyplot as plt 
 from copy import copy
 
-from synchronization import ptp_master
+try:
+    from synchronization import ptp_master
+except:
+    from scripts.synchronization import ptp_master
+
 
 class ODriveFailure(Exception):
     pass
@@ -26,6 +32,9 @@ class ODriveInterfaceAPI(object):
     traj_start = None
     traj_end = None
     traj_waipoints = []
+    times = []
+    positions = []
+    speeds = []
     
     #default speed & accel
     speed = 3
@@ -43,7 +52,7 @@ class ODriveInterfaceAPI(object):
             self.encoder_cpr = self.driver.axis.encoder.config.cpr
             self.connected = True
             #self.calibrated = ...
-         #self.ptp_master = ptp_master.PTP_Master()
+        self.ptp_master = ptp_master.PTP_Master()
             
             
     def __del__(self):
@@ -273,21 +282,21 @@ class ODriveInterfaceAPI(object):
             
         self.axis.controller.input_pos = target_pos
         
-        times = []
-        positions = []
-        speeds = []
+        self.times = []
+        self.positions = []
+        self.speeds = []
         
         start_pos = self.axis.pos_vel_mapper.pos_rel
         start_time = time.time()
         while(abs(self.axis.pos_vel_mapper.pos_rel-target_pos) > 0.1):
             current_time = time.time()
-            current_position = self.axis.pos_vel_mapper.pos_rel
-            current_speed = self.axis.pos_vel_mapper.vel
+            current_position = (self.axis.pos_vel_mapper.pos_rel - start_pos) * math.pi * self.diameter_wheels * self.transmission_ratio
+            current_speed = self.axis.pos_vel_mapper.vel * math.pi * self.diameter_wheels * self.transmission_ratio
             
-            times.append(current_time - start_time)
-            positions.append(current_position - start_pos)
-            speeds.append(current_speed)
-            time.sleep(0.001)            
+            self.times.append(current_time + self.ptp_master.offset_final)
+            self.positions.append(current_position)
+            self.speeds.append(current_speed)
+            self.accurate_delay(0.0333333)            
         
         return True      
 
@@ -330,7 +339,24 @@ class ODriveInterfaceAPI(object):
         return True
         
     def synchronous_start(self):
-        if (self.ptp_master.sync_clock()):
-            time.sleep(3)
-            self.go_to_end()
+        if not (self.ptp_master.check_connection()):
+            return "Recording script at iMac not ready"
         
+        if not self.engaged():
+            return "Not engaged"
+        
+        if (self.ptp_master.sync_clock()):
+            self.accurate_delay(3)
+            if (self.go_to_end()):
+                data = json.dumps({"times": self.times, "positions": self.positions, "speeds": self.speeds})
+                self.ptp_master.send(data)
+        
+        return True
+            
+    def accurate_delay(self, delay):
+        ''' Function to provide accurate time delay in seconds
+        '''
+        _ = (time.perf_counter() + delay)
+        while time.perf_counter() < _:
+            pass
+            

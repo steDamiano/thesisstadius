@@ -379,6 +379,10 @@ img,svg {
     display:inline;
 }
 
+#currentPos {
+    display:inline;
+}
+
 #startPosition {
     display:inline;
 }

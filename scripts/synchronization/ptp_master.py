@@ -7,19 +7,21 @@ import sounddevice as sd
 import time
 import soundfile as sf
 import os
+from scipy import stats
 
 class PTP_Master(object):
     """ Connectio Info """
     server_socket = None
     connected = False
     PORT = 2468
-    SLAVE_ADDRESS = "192.168.42.227"
+    SLAVE_ADDRESS = "192.168.0.57"
     NUM_OF_TIMES = 20
 
     OFFSETS = []
     DELAYS = []
     
     synced_time = None
+    offset_final = 0
     
     """ Audio Info """
     device = None
@@ -94,7 +96,8 @@ class PTP_Master(object):
                     self.DELAYS.append(delay)
                     self.send("next")
                 
-                offset_final = sum(self.OFFSETS) / len(self.OFFSETS)
+                offset_final = stats.trim_mean(self.OFFSETS, 0.1)
+                self.offset_final = offset_final
                 delay_final = sum(self.DELAYS) / len(self.DELAYS)
                 print('Final offset: ', offset_final)
                 print('Final delay: ', delay_final)
@@ -164,7 +167,7 @@ class PTP_Master(object):
         except Exception as e:
             print("Error while sending request: " + str(e))
             print("Tried to send: " + data)
-
+            
     
     def check_connection(self):
         self.setup()

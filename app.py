@@ -115,21 +115,21 @@ def go_to():
     if request.method == 'POST':
         global goto
         goto = request.json['gotoData']
-        result = float(goto)
-        goto = (goto / (math.pi * od.diameter_wheels)) / od.transmission_ratio
+        goto_m = float(goto)
+        goto = (goto_m / (math.pi * od.diameter_wheels)) / od.transmission_ratio
         
         try:
             goto = goto + od.traj_start
         except:
             return "Trajectory not yet defined"
         
-        result = od.go_to(goto)
+        res = od.go_to(goto)
         
-        if (result == True):
-            forward_message = "Moving to %s m" % (result)
+        if (res == True):
+            forward_message = "Moving to %s m" % (goto_m)
         else:
-            update_debug_window(result)
-            forward_message = result
+            update_debug_window(res)
+            forward_message = res
             
         return (forward_message)
     else:
@@ -196,7 +196,7 @@ def idle():
 
 @app.route("/playTrack/")
 def play_track():
-    result = od.go_to_end()
+    result = od.synchronous_start()
     
     if (result == True):
         forward_message = "Arrived at end" 
@@ -226,11 +226,13 @@ def cart_data():
     try:
         current_vel = od.get_speed()
         current_speed = round(((current_vel) * (math.pi * od.diameter_wheels)) * od.transmission_ratio,2)
-        templateData = {'vel': current_speed}
+        current_pos = round((od.get_pos() - od.traj_start) * (math.pi * od.diameter_wheels) * od.transmission_ratio, 2)
+        templateData = {'vel': current_speed, 'pos': current_pos}
         return jsonify(templateData), 200
     except Exception as e:
-        current_vel = 69
-        templateData = {'vel': current_vel}
+        current_vel = 0
+        current_pos = 0
+        templateData = {'vel': current_vel, 'pos': current_pos}
         print(e, file=sys.stderr)
         return jsonify(templateData), 200
 
@@ -248,6 +250,6 @@ def update_debug_window(message):
 def inject_debug_messages():
     return {'debug_messages': debug_messages}
 
-
+import os
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
