@@ -96,7 +96,6 @@ class PTP_Master(object):
                 self.synced_time = self.get_time() + offset_final
                 
                 print("Synced time: ", self.synced_time)
-                print("Stream latency: ", self.sine_stream.latency)
                 print("Succesfull packets: ", len(self.OFFSETS))
                 return True
         
