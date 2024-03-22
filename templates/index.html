@@ -49,6 +49,18 @@
 				</form>
 				<!-- </form> -->
 			</div><br>
+			<div id="speedDiv">
+				<b>Set unit distance</b>
+				<!-- <form action="/accel/" method="POST"> -->
+				<form id="unitDistForm" onsubmit="unitdistSubmit();return false;" name="unitdist">
+					<input class="unitDist" type="text" id="unitdist_input" name="unitdist_input" value="{{ unitdist }}">m
+				</form>
+				<!-- </form> -->
+			</div><br>
+			<div id="quantMotionDiv">
+				<button class="button nextPosBtn" id="nextPosBtn" name="nextPosBtn" type="submit">Next position</button>
+				<button class="button prevPosBtn" id="prevPosBtn"name="prevPosBtn" type="submit">Previous position</button>
+			</div><br>
 		</div>
 
 		<div id="trackBuilder">
@@ -68,7 +80,7 @@
 				<!-- <h4><u>Current values</u></h4> -->
 				Track distance = <div id="trackDistance"></div> m <br>
 				<!-- Current speed = {{ current_speed }} m/s <br> -->
-				Current pos = <div id="currentPos"></div>m<br>
+				Current pos precise= <div id="currentPos"></div>m<br>
 				Current speed = <div id="currentSpeed"></div>m/s<br>
 			</div>
 		</div>
@@ -81,6 +93,9 @@
 		var condData;
 		// var ODriveName = "no connection";
 		var ODriveName = "test"; //TODO: Remove, enkel voor test debugging
+
+		var unitDistance;
+		var currPosition = 0;
 
 	  	// JavaScript code to update the debugging window
 	  	function updateDebugWindow(message) {
@@ -101,11 +116,74 @@
 	    })
 	    .catch(error => console.log(error));
 
+		// Set unit distance function
+		function unitdistSubmit() {
+			var form = parseFloat(document.getElementById('unitdist_input').value);
+			console.log(form);
+			unitDistance = form;
+		}
+
+		// Go to next unit distance
+		const nextPosButton = document.getElementById('nextPosBtn');
+		
+		nextPosButton.addEventListener('click', function (event) {
+			
+			var nextPosition = currPosition + unitDistance;
+			
+			const gotoNext = function(_nextPosition) {
+				fetch('/goto/', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({gotoData: _nextPosition})
+					})
+					.then(response => response.text())
+					.then(result => {
+					console.log(result);
+					updateDebugWindow(result);
+					})
+					.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+					});
+			}
+			gotoNext(nextPosition)
+			currPosition = nextPosition
+		});
+
+		// Go to previous position
+		const prevPosButton = document.getElementById('prevPosBtn');
+		
+		prevPosButton.addEventListener('click', function (event) {
+			
+			var prevPosition = currPosition - unitDistance;
+			
+			const gotoNext = function(_prevPosition) {
+				fetch('/goto/', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({gotoData: _prevPosition})
+					})
+					.then(response => response.text())
+					.then(result => {
+					console.log(result);
+					updateDebugWindow(result);
+					})
+					.catch(error => {
+					console.error('Error:', error);
+					updateDebugWindow('Error:', error);
+					});
+			}
+			gotoNext(prevPosition)
+			currPosition = prevPosition
+		});
 
 		//Speed change Function
 		function speedSubmit() {
 			var form = document.getElementById('speed_input').value;
-			// const speedData = Object.fromEntries(new FormData(form).entries());
 			console.log(form);
 			fetch('/speed/', {
 				  method: 'POST',
@@ -130,6 +208,7 @@
 		//goto Function
 		function gotoSubmit() {
 			var form = document.getElementById('goto_input').value;
+			currPosition = parseFloat(form)
 			// const gotoData = Object.fromEntries(new FormData(form).entries());
 			console.log(form);
 			fetch('/goto/', {
@@ -368,6 +447,7 @@
 					console.error('Error:', error);
 					updateDebugWindow('Error:', error);
 				});
+				currPosition = 0
 			}
 		});
    	

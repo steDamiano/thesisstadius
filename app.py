@@ -225,8 +225,8 @@ def reset_pos():
 def cart_data():
     try:
         current_vel = od.get_speed()
-        current_speed = round(((current_vel) * (math.pi * od.diameter_wheels)) * od.transmission_ratio,2)
-        current_pos = round((od.get_pos() - od.traj_start) * (math.pi * od.diameter_wheels) * od.transmission_ratio, 2)
+        current_speed = round(((current_vel) * (math.pi * od.diameter_wheels)) * od.transmission_ratio,4)
+        current_pos = round((od.get_pos() - od.traj_start) * (math.pi * od.diameter_wheels) * od.transmission_ratio, 4)
         templateData = {'vel': current_speed, 'pos': current_pos}
         return jsonify(templateData), 200
     except Exception as e:

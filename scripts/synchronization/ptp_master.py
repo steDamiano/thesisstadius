@@ -13,7 +13,7 @@ class PTP_Master(object):
     server_socket = None
     connected = False
     PORT = 2468
-    SLAVE_ADDRESS = "192.168.0.57"
+    SLAVE_ADDRESS = "192.168.0.176"
     NUM_OF_TIMES = 20
 
     OFFSETS = []
